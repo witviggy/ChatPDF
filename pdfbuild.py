@@ -77,7 +77,7 @@ def main():
         chunks = text_splitter.split_text(text=text)
 
         # Define your OpenAI API key here
-        openai_api_key = "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"
+        openai_api_key = "YOUR_OPENAI_APIKEY"
 
         # Define store_name as you did previously
         store_name = pdf.name[:-4]
