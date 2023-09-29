@@ -1,6 +1,5 @@
 import streamlit as st
 from dotenv import load_dotenv
-import pickle
 from PyPDF2 import PdfReader
 from streamlit_extras.add_vertical_space import add_vertical_space
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -13,15 +12,18 @@ import os
 
 # Sidebar contents
 with st.sidebar:
-    st.title('🤖💬 LLM Chat App')
+    st.title('🤖💬PDFChat')
     st.markdown('''
     ## About
-    Welcome to the LLM-powered chatbot! This chatbot is built using cutting-edge technologies:
-    - [Streamlit](https://streamlit.io/) 🚀
-    - [LangChain](https://python.langchain.com/) 📚
-    - [OpenAI](https://platform.openai.com/docs/models) LLM model 🧠
+    "Welcome to the LLM-powered chatbot! This chatbot is built using cutting-edge technologies:
 
-    Feel free to explore its features and ask questions about your PDF files!
+    Streamlit 🚀: Streamlit is a fast and efficient Python library for creating interactive web applications. It allows us to build this chatbot with ease.
+                
+    LangChain 📚: LangChain is a Python library that provides tools for natural language processing tasks like text splitting and embeddings.
+                
+    OpenAI LLM model 🧠: OpenAI's LLM (Language Model) is a powerful AI model that understands and generates human-like text. It powers the intelligence behind this chatbot.
+
+    Feel free to explore its features and ask questions about your PDF files! This chatbot leverages these technologies to provide you with information and answers related to PDF documents."
     ''')
 
     # Add a section for user options
@@ -33,23 +35,10 @@ with st.sidebar:
     st.write("- Enable or disable embeddings for text processing.")
     st.write("- Choose to show or hide the chat history.")
 
-    st.header("👤 User Information")
-    user_name = st.text_input("Your Name", "")
-    user_email = st.text_input("Your Email", "")
+    st.header("🔗 Links")
+    st.markdown("[GitHub Repository](https://github.com/witviggy/ChatPDF)")
+    st.markdown("[Report an Issue](https://github.com/witviggy/ChatPDF/issues)")
 
-    st.write("Share your information with the chatbot (optional):")
-    st.write("- Personalize your interactions.")
-    st.write("- Receive responses and recommendations.")
-
-    st.header("🔗 Links and Credits")
-    st.markdown("[Prompt Engineer YouTube](https://youtube.com/@engineerprompt)")
-    st.markdown("[GitHub Repository](https://github.com/yourusername/yourrepository)")
-    st.markdown("[Report an Issue](https://github.com/yourusername/yourrepository/issues)")
-
-    st.write("Explore more:")
-    st.write("- Watch tutorial videos.")
-    st.write("- Contribute to the open-source project.")
-    st.write("- Report issues or provide feedback.")
     add_vertical_space(5)
     st.write('Made with ❤️ by Vignesh M')
 
@@ -76,21 +65,18 @@ def main():
 
         chunks = text_splitter.split_text(text=text)
 
-        # Define your OpenAI API key here
-        openai_api_key = "YOUR_OPENAI_APIKEY"
-
         # Define store_name as you did previously
         store_name = pdf.name[:-4]
         st.write(f'{store_name}')
 
-        if os.path.exists(f"{store_name}.pkl"):
-            with open(f"{store_name}.pkl", "rb") as f:
-                VectorStore = pickle.load(f)
-        else:
+        # Load the OpenAI API key from the environment variable
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+
+        if enable_embeddings:
             embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
             VectorStore = FAISS.from_texts(chunks, embedding=embeddings)
-            with open(f"{store_name}.pkl", "wb") as f:
-                pickle.dump(VectorStore, f)
+        else:
+            VectorStore = FAISS.from_texts(chunks)
 
         query = st.text_input("Ask questions about your PDF file:")
 
