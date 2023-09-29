@@ -70,7 +70,7 @@ def main():
         st.write(f'{store_name}')
 
         # Load the OpenAI API key from the environment variable
-        openai_api_key = st.secrets["openai_api_key"]
+        openai_api_key = st.secrets[openai_api_key]
 
         if enable_embeddings:
             embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
